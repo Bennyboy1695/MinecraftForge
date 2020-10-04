@@ -57,6 +57,18 @@ public class CustomModsFolderLocator extends ModsFolderLocator {
         this.modFolder = modFolder;
         this.customName = name;
     }
+    @Override
+    public List<IModFile> scanMods() {
+        LOGGER.debug(SCAN,"Scanning mods dir {} for mods", this.modFolder);
+        List<Path> excluded = ModDirTransformerDiscoverer.allExcluded();
+        return uncheck(()-> Files.list(this.modFolder))
+                .filter(p->!excluded.contains(p))
+                .sorted(Comparator.comparing(path-> StringUtils.toLowerCase(path.getFileName().toString())))
+                .filter(p->StringUtils.toLowerCase(p.getFileName().toString()).endsWith(SUFFIX))
+                .map(p->ModFile.newFMLInstance(p, this))
+                .peek(f->modJars.compute(f, (mf, fs)->createFileSystem(mf)))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public String name() {

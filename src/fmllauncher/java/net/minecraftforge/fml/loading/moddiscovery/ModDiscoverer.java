@@ -23,11 +23,7 @@ import cpw.mods.gross.Java9ClassLoaderUtil;
 import cpw.mods.modlauncher.Launcher;
 import cpw.mods.modlauncher.ServiceLoaderStreamUtils;
 import cpw.mods.modlauncher.api.LamdbaExceptionUtils;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fml.loading.LoadingModList;
-import net.minecraftforge.fml.loading.ModDirTransformerDiscoverer;
-import net.minecraftforge.fml.loading.ModSorter;
+import net.minecraftforge.fml.loading.*;
 import net.minecraftforge.fml.loading.progress.StartupMessageManager;
 import net.minecraftforge.forgespi.Environment;
 import net.minecraftforge.forgespi.locating.IModFile;
@@ -86,6 +82,8 @@ public class ModDiscoverer {
         locatorList = ServiceLoaderStreamUtils.toList(this.locators);
         locatorList.forEach(l->l.initArguments(arguments));
         locatorList.add(new MinecraftLocator());
+        locatorList.add(new CustomModsFolderLocator());
+        locatorList.add(new CustomModsFolderLocator(FMLPaths.MODSDIR.get().getParent().resolve("custom").resolve("plugins"), "custom plugins folder"));
         LOGGER.debug(CORE,"Found Mod Locators : {}", ()->locatorList.stream().map(iModLocator -> "("+iModLocator.name() + ":" + iModLocator.getClass().getPackage().getImplementationVersion()+")").collect(Collectors.joining(",")));
     }
 
